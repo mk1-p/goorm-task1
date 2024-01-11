@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Board Page</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<h2>게시물 목록</h2>
+
+<!-- 게시물 목록 -->
+<div id="boardList">
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Content</th>
+            <th>Created At</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="board : ${boards}">
+            <td th:text="${board.id}"></td>
+            <td th:text="${board.title}"></td>
+            <td th:text="${board.content}"></td>
+            <td th:text="${board.createdAt}"></td>
+            <td>
+                <button type="button" onclick="deleteBoard(${board.id})">삭제</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- If there are no boards, display a message -->
+<div th:if="${#lists.isEmpty(boards)}">
+    <p>등록된 게시물이 없습니다.</p>
+</div>
+
+<!-- 게시물 작성 폼 -->
+<h2>게시물 작성</h2>
+<form id="boardForm">
+<!--    <label for="boardId">ID:</label>-->
+<!--    <input type="text" id="boardId" name="board_id" required>-->
+
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title" required>
+
+    <label for="content">Content:</label>
+    <textarea id="content" name="content" required></textarea>
+
+    <button type="button" onclick="submitBoardForm()">게시물 등록</button>
+</form>
+
+<!-- 게시물 목록 갱신 버튼 -->
+<button id="refreshButton">목록 갱신</button>
+
+<script>
+    // 페이지 로드 시 초기 데이터 가져오기
+    fetchBoardList();
+
+    // 게시물 목록 갱신 버튼 클릭 시 데이터 갱신
+    document.getElementById('refreshButton').addEventListener('click', function() {
+        fetchBoardList();
+    });
+
+    // 폼 제출 시 데이터 전송
+    function submitBoardForm() {
+        // var boardId = document.getElementById('boardId').value;
+        var title = document.getElementById('title').value;
+        var content = document.getElementById('content').value;
+
+        var data = {
+            // board_id: boardId,
+            title: title,
+            content: content
+        };
+
+        fetch('/api/boards', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (response.ok) {
+                    // 성공 시 폼 초기화 및 목록 갱신
+                    document.getElementById('boardForm').reset();
+                    fetchBoardList();
+                } else {
+                    console.error('게시물 등록 실패');
+                }
+            })
+            .catch(error => {
+                console.error('게시물 등록 실패:', error);
+            });
+    }
+
+    // 게시물 삭제
+    function deleteBoard(boardId) {
+        fetch('/api/boards/' + boardId, {
+            method: 'DELETE',
+        })
+            .then(response => {
+                if (response.ok) {
+                    // 삭제 후 목록 갱신
+                    fetchBoardList();
+                } else {
+                    console.error('게시물 삭제 실패');
+                }
+            })
+            .catch(error => {
+                console.error('게시물 삭제 실패:', error);
+            });
+    }
+
+    // 게시물 목록 가져오기
+    function fetchBoardList() {
+        fetch('/api/boards')
+            .then(response => response.json())
+            .then(data => {
+                // 가져온 데이터를 이용하여 게시물 목록 업데이트
+                updateBoardList(data);
+            })
+            .catch(error => {
+                console.error('게시물 목록 가져오기 실패:', error);
+            });
+    }
+
+    // 게시물 목록 업데이트
+    function updateBoardList(data) {
+        var boardListContainer = document.getElementById('boardList');
+        boardListContainer.innerHTML = '';
+
+        if (data.length > 0) {
+            var table = document.createElement('table');
+            var thead = document.createElement('thead');
+            var tbody = document.createElement('tbody');
+
+            var headerRow = document.createElement('tr');
+            ['ID', 'Title', 'Content', 'Created At', 'Action'].forEach(function(headerText) {
+                var th = document.createElement('th');
+                th.textContent = headerText;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+
+            data.forEach(function(board) {
+                var row = document.createElement('tr');
+                ['board_id', 'title', 'content', 'created_at'].forEach(function(property) {
+                    var td = document.createElement('td');
+                    td.textContent = board[property];
+                    row.appendChild(td);
+                });
+
+                var actionTd = document.createElement('td');
+                var deleteButton = document.createElement('button');
+                deleteButton.textContent = '삭제';
+                deleteButton.setAttribute('type', 'button');
+                deleteButton.addEventListener('click', function() {
+                    deleteBoard(board.board_id);
+                });
+                actionTd.appendChild(deleteButton);
+
+                row.appendChild(actionTd);
+                tbody.appendChild(row);
+            });
+
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            boardListContainer.appendChild(table);
+        } else {
+            var noDataMessage = document.createElement('p');
+            noDataMessage.textContent = '등록된 게시물이 없습니다.';
+            boardListContainer.appendChild(noDataMessage);
+        }
+    }
+</script>
+</body>
+</html>
