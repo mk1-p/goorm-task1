@@ -23,7 +23,6 @@ services:
     volumes:
       - goorm-t1-db:/var/lib/postgresql/data
     networks:
-      -
       - goorm-t1-network
 
     # 환경 변수
@@ -35,6 +34,8 @@ services:
 
     # 컨테이너 내부 간 통신만을 지원할때는 expose
     # 외부 접속 포트를 열어줄때는 ports 로 포트포워딩 해줘야한다.
+    expose:
+      - 5432
     ports:
       - 11001:5432
 
