@@ -4,16 +4,12 @@ server:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://database:5432/${POSTGRES_DB}?characterEncoding=utf8&serverTimezone=Asia/Seoul
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
 
   jpa:
-    hibernate:
-      ddl-auto: create
     properties:
       hibernate:
-        format_sql: true
-        default_batch_fetch_size: 100
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_batch_fetch_size: 100
     open-in-view: false

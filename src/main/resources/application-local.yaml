@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    # 같은 로컬의 도커 환경이지만 네트워크 환경이 다르다면 localhost가 실행되지 않는다.
+    # host.docker.internal 값으로 host를 이용한 내부 네트워크로 통신이 가능
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?characterEncoding=utf8&serverTimezone=Asia/Seoul
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
