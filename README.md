@@ -76,8 +76,8 @@ $ docker run --name task1-db -p 5432:5432 --env-file ./.env.local -d postgres:16
 #### 2. Spring Back App
 도커 파일로 실행하는 경우
 ```bash
-$ docker build -t goorm-task1-image . 
-$ docker run --name task1-spring -p 80:80 --env-file ./.env.local goorm-task1-image
+$ docker build -t mk1dev662/goorm-task1:latest . 
+$ docker run --name task1-spring -p 80:80 --env-file ./.env.local mk1dev662/goorm-task1:latest
 ```
 #### 3. 환경변수
 ```env
