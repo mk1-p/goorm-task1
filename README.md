@@ -173,13 +173,35 @@ Content-Type : application/json
 | title   | string | O   | 20    | 게시물 제목 |
 | content | string | O   | 256   | 게시물 내용 |
 
-예외처리는 되어있지 않지만, Table Column 에 Limit이 걸려있습니다.
+예외처리는 되어있지 않지만, Table Column 에 Limit 걸려있습니다.
 
 #### Response
 ```
 status 201 ok
 ```
 
+<br>
+<br>
+
+### Delete Board
+
+---
+
+
+### Header
+> Uri : /api/boards/{board_id} <br>
+Method : DELETE <br>
+Content-Type : application/json
+
+
+### Request (Path Param)
+> * board_id | number | 게시물 아이디 <br> 
+> * ex : /api/boards/2
+
+#### Response
+```
+status 200 ok
+```
 
 
 
